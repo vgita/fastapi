@@ -1,5 +1,6 @@
+from typing import Optional
 from fastapi import Depends, FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, field_validator
 from sqlalchemy.orm import Session
 
 from database import SessionLocal, User
@@ -13,9 +14,21 @@ def get_db():
 
 app = FastAPI()
 
+class Tweet(BaseModel):
+    content: str
+    hashtags: list[str]
+
 class UserBody(BaseModel):
     name: str
-    email: str
+    email: EmailStr
+    age: Optional[int]
+    tweets: list[Tweet]|None = None
+    @field_validator("age")
+    def validate_age(cls, value):
+        if value < 18 or value > 100:
+            raise ValueError("Age must be between 18 and 100")
+        return value
+    
 
 @app.get("/users")
 def read_users(db:Session = Depends(get_db)):
