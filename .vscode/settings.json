@@ -1,3 +1,9 @@
 {
-    "cSpell.words": ["autoflush", "bson", "sessionmaker", "uploadfile"]
+    "cSpell.words": [
+        "autoflush",
+        "autouse",
+        "bson",
+        "sessionmaker",
+        "uploadfile"
+    ]
 }
