@@ -1,8 +1,9 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException
-from models.task import Task, TaskWithId, UpdateTask
+from models.task import Task, TaskWithId, UpdateTask, TaskV2WithId
 from repos.tasks_repo import (
   read_all_tasks,
+  read_all_tasks_v2,
   read_task, 
   create_task, 
   update_task, 
@@ -22,6 +23,11 @@ def get_tasks(
   if title:
     tasks = [task for task in tasks if title.lower() in task.title.lower()]
 
+  return tasks
+
+@router.get("/v2/tasks", response_model=list[TaskV2WithId])
+def get_tasks_v2():
+  tasks = read_all_tasks_v2()
   return tasks
 
 @router.get("/tasks/search", response_model=list[TaskWithId])
