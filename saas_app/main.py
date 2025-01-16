@@ -15,6 +15,8 @@ from premium_access import router as premium_router
 from github_login import router as github_router
 from third_party_login import resolve_github_token
 from mfa import router as mfa_router 
+from api_key import router as api_key_router
+from user_session import router as user_session_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,7 +33,8 @@ app.include_router(rbac_router)
 app.include_router(premium_router)
 app.include_router(github_router)
 app.include_router(mfa_router)
-
+app.include_router(api_key_router)
+app.include_router(user_session_router)
 
 @app.post("/register/user", 
           status_code= status.HTTP_201_CREATED,
