@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Protoapp Debugger: FastAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/protoapp/run_server.py",
+            "cwd": "${workspaceFolder}/protoapp",
+            // "pythonPath": "${workspaceFolder}/.venv/bin/python", // or your venv path
+            "console": "integratedTerminal",
+            "jinja": true
+        }
+    ]
+}

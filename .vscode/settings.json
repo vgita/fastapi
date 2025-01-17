@@ -1,9 +1,17 @@
 {
     "cSpell.words": [
+        "ASGI",
         "autoflush",
         "autouse",
         "bson",
+        "Colourized",
         "fakesession",
+        "levelname",
+        "levelprefix",
+        "poolclass",
+        "protoapp",
+        "pytest",
+        "pythonpath",
         "sessionmaker",
         "totp",
         "uploadfile"
