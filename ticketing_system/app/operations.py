@@ -4,7 +4,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.database import Ticket
+from app.database import Ticket, TicketDetails
 from typing import Optional
 
 async def create_ticket(
@@ -28,7 +28,8 @@ async def create_ticket(
     ticket = Ticket(
         show=show_name,
         user=user,
-        price=price
+        price=price,
+        details=TicketDetails()
     )
     async with db_session.begin():
         db_session.add(ticket)
@@ -110,4 +111,24 @@ async def delete_ticket(
 
     if tickets_removed.rowcount == 0:
       return False
+    return True
+  
+async def update_ticket_details(
+  db_session:AsyncSession,
+  ticket_id:int,
+  updating_details:dict
+) -> bool:
+    ticket_query = update(TicketDetails).where(
+      TicketDetails.ticket_id == ticket_id)
+
+    if updating_details != {}:
+      ticket_query = ticket_query.values(**updating_details)
+
+      result = await db_session.execute(ticket_query)
+
+      await db_session.commit()
+
+      if result.rowcount == 0:
+        return False
+      
     return True

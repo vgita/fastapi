@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
 
 SQLALCHEMY_DATABASE_URL = (
-  "sqlite+aiosqlite:///./database.db"
+  "sqlite+aiosqlite:///./.database.db"
 )
 
 def get_engine():
