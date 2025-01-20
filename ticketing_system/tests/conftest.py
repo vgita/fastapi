@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from app.database import (
   Base,
   Ticket,
+  TicketDetails
 )
 from app.db_connection import get_db_session
 from app.main import app
@@ -37,6 +38,38 @@ async def db_session_test(
     await db_engine_test.dispose()
 
 @pytest.fixture
+async def second_session_test(
+    db_engine_test,
+):
+    TestingAsyncSessionLocal = sessionmaker(
+        bind=db_engine_test, class_=AsyncSession
+    )
+    async with TestingAsyncSessionLocal() as session:
+        yield session
+
+
+@pytest.fixture
+async def third_session_test(
+    db_engine_test,
+):
+    TestingAsyncSessionLocal = sessionmaker(
+        bind=db_engine_test, class_=AsyncSession
+    )
+    async with TestingAsyncSessionLocal() as session:
+        yield session
+
+
+@pytest.fixture
+async def fourth_session_test(
+    db_engine_test,
+):
+    TestingAsyncSessionLocal = sessionmaker(
+        bind=db_engine_test, class_=AsyncSession
+    )
+    async with TestingAsyncSessionLocal() as session:
+        yield session
+
+@pytest.fixture
 async def fill_database_with_tickets(db_session_test):
     tickets = [
         Ticket(show="The Rolling Stones Concert")
@@ -60,6 +93,7 @@ async def add_special_ticket(db_session_test):
         id=1234,
         show="Special Show",
         price=100.0,
+        details=TicketDetails()
     )
     async with db_session_test.begin():
         db_session_test.add(ticket)

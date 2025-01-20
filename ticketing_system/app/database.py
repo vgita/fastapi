@@ -86,3 +86,11 @@ class TicketDetails(Base):
   )
   seat:Mapped[str|None]
   ticket_type:Mapped[str|None]
+
+class CreditCard(Base):
+  __tablename__="credit_cards"
+  id:Mapped[int]=mapped_column(primary_key=True)
+  number:Mapped[str]
+  expiration_date:Mapped[str]
+  cvv:Mapped[str]
+  card_holder_name:Mapped[str]

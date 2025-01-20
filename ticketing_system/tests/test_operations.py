@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+import asyncio
 
 from app.database import  Ticket
 from app.operations import (
@@ -7,6 +8,7 @@ from app.operations import (
     delete_ticket,
     get_ticket,
     update_ticket_price,
+    sell_ticket_to_user
 )
 
 SPECIAL_TICKET_ID = 1234
@@ -83,3 +85,22 @@ async def test_update_ticket_price(
     await update_ticket_price(db_session_test, 111, 250.0)
     is False
   ) # non existing ticket
+
+async def test_concurrent_ticket_sales(
+    add_special_ticket,
+    db_session_test,
+    second_session_test,
+):
+  result = await asyncio.gather(
+    sell_ticket_to_user(db_session_test, SPECIAL_TICKET_ID, "Alice"),
+    sell_ticket_to_user(second_session_test, SPECIAL_TICKET_ID, "Bob"),
+  )
+
+  assert result in ([True, False], [False, True]) # one of the sales should succeed
+
+  ticket = await get_ticket(db_session_test, SPECIAL_TICKET_ID)
+
+  if result[0]:
+    assert ticket.user == "Alice"
+  else:
+    assert ticket.user == "Bob"

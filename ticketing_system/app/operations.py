@@ -1,11 +1,13 @@
 from sqlalchemy import (
+  and_,
   update,
   delete
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.database import Ticket, TicketDetails
+from app.database import Ticket, TicketDetails, Event, Sponsor, Sponsorship
 from typing import Optional
+from sqlalchemy.orm import joinedload, load_only
 
 async def create_ticket(
     db_session: AsyncSession,
@@ -125,6 +127,88 @@ async def update_ticket_details(
       ticket_query = ticket_query.values(**updating_details)
 
       result = await db_session.execute(ticket_query)
+
+      await db_session.commit()
+
+      if result.rowcount == 0:
+        return False
+      
+    return True
+
+async def get_events_with_sponsors(
+      db_session: AsyncSession
+)-> list[Event]:
+    query = (
+       select(Event)
+       .options(joinedload(Event.sponsors))
+    )
+
+    async with db_session as session:
+       result = await session.execute(query)
+       events = result.scalars().all()
+
+    return events
+
+async def get_event_sponsorships_with_amount(
+    db_session: AsyncSession,
+    event_id: int
+):
+    query=(
+      select(Sponsor.name, Sponsorship.amount)
+      .join(
+        Sponsorship,
+        Sponsorship.sponsor_id == Sponsor.id
+      )
+      .where(Sponsorship.event_id == event_id)
+      .order_by(Sponsorship.amount.desc())
+    )
+
+    async with db_session as session:
+      result = await session.execute(query)
+      sponsor_contributions = result.fetchall()
+
+    return sponsor_contributions
+
+async def get_events_tickets_with_user_price(
+    db_session: AsyncSession,
+    event_id: int
+) -> list[Ticket]:
+  query = (
+     select(Ticket)
+     .where(Ticket.event_id == event_id)
+     .options(
+        load_only(
+           Ticket.id, Ticket.user, Ticket.price
+        )
+     )
+  )
+
+  async with db_session as session:
+    result = await session.execute(query)
+    tickets = result.scalars().all()
+
+  return tickets
+
+async def sell_ticket_to_user (
+    db_session: AsyncSession,
+    ticket_id: int,
+    user: str
+) -> bool:
+    ticket_query = (
+       update(Ticket)
+       .where(
+          and_(
+             Ticket.id == ticket_id,
+             Ticket.sold == False
+          )
+       )
+       .values(user=user, sold=True)
+    )
+
+    async with db_session as session:
+      result = (
+         await db_session.execute(ticket_query)
+      )
 
       await db_session.commit()
 
