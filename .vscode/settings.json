@@ -6,6 +6,7 @@
         "autouse",
         "bson",
         "Colourized",
+        "elastichsearch",
         "fakesession",
         "Fernet",
         "joinedload",

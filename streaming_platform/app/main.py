@@ -5,7 +5,9 @@ from fastapi import (
 import logging
 from contextlib import asynccontextmanager
 from app.db_connection import (
-  ping_mongo_db_server
+  ping_mongo_db_server,
+  ping_elasticsearch_server,
+  ping_redis_server
 )
 from bson import ObjectId
 from fastapi import Body, Depends
@@ -13,6 +15,7 @@ from app.database import mongo_database
 from fastapi.encoders import ENCODERS_BY_TYPE
 from pydantic import BaseModel
 from app import third_party_endpoint
+from app import main_search
 
 logger = logging.getLogger("uvicorn")
 
@@ -21,6 +24,8 @@ ENCODERS_BY_TYPE[ObjectId] = str
 @asynccontextmanager
 async def lifespan(app:FastAPI):
   await ping_mongo_db_server()
+  await ping_elasticsearch_server()
+  await ping_redis_server()
   db = mongo_database()
   await db.songs.drop_indexes()
   await db.songs.create_index(
@@ -31,6 +36,7 @@ async def lifespan(app:FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(third_party_endpoint.router)
+app.include_router(main_search.router)
 
 @app.post("/songs")
 async def add_song(
