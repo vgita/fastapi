@@ -16,6 +16,7 @@
         "pytest",
         "pythonpath",
         "sessionmaker",
+        "thirdparty",
         "totp",
         "uploadfile"
     ]
