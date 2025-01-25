@@ -9,6 +9,7 @@
         "elastichsearch",
         "fakesession",
         "Fernet",
+        "huggingface",
         "joinedload",
         "levelname",
         "levelprefix",
